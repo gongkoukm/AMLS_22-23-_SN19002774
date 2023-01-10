@@ -11,7 +11,8 @@ from sklearn.svm import LinearSVC
 from sklearn.neighbors import KNeighborsClassifier
 import numpy as np
 import matplotlib.pyplot as plt
-
+from sklearn.model_selection import KFold
+from sklearn.model_selection import cross_val_score
 
 
 basedir = 'D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/Datasets/dataset_AMLS_22-23/celeba'
@@ -158,7 +159,7 @@ for i in range(len(eyemouth_dis)):
   emt_ratios.append(ratio)
 
 
-# Points of the bottom of eyes(landmarks = 52,58)
+# Points of the top and bottom lip(landmarks = 52,58)
 x7 = get_points(51,0)
 y7 = get_points(51,1)
 x8 = get_points(57,0)
@@ -181,78 +182,51 @@ curvatures = np.abs(curvatures)
 # print(curvatures[:30])
 # print(filtered_smile_labels[:30])
 
-# # Remove '\n' newline characters
-# gender_labels = [label.strip() for label in gender_labels]
-# colors = []
-# for label in gender_labels:
-#     if label == 1:
-#         colors.append("red")
-#     else:
-#         colors.append("blue")
+
+X1 = lt_ratios
+X2 = emt_ratios
+
+# If there are more than one features, combine them to one list
+X = []
+for i in range(len(X2)):
+  # Create a feature vector by combining the values from X1 and X2
+  x = (curvatures[i], X1[i], X2[i])
+  # Add the feature vector to the list
+  X.append(x)
 
 
-# # print(curvatures[:30])    
-# print(gender_labels[:30])
-# print(no_filenames)
-
-
-# print(gender_labels[4])
-# print(colors[:30])
-# # Create the plot
-# plt.scatter(curvatures, [0]*len(curvatures), c=colors, cmap='RdYlBu')
-
-# # Show the plot
-# plt.show()
-
-
-
-
-
-
-
-
-
-
-
-
-
-# X1 = lt_ratios
-# X2 = emt_ratios
-
-# X = []
-# for i in range(len(X1)):
-#   # Create a feature vector by combining the values from X1 and X2
-#   x = (X1[i], X2[i])
-#   # Add the feature vector to the list
-#   X.append(x)
-
-
-# Reshape if X is 1D array
-curvatures = np.array(curvatures)
-curvatures = curvatures.reshape(-1, 1)
+# # Reshape if X is 1D array
+# curvatures = np.array(curvatures)
+# curvatures = curvatures.reshape(-1, 1)
 # print(lt_ratios[:20])
 y = filtered_smile_labels
 
 # Split the data into a training set and a test set
-X_train, X_test, y_train, y_test = train_test_split(curvatures, y, test_size=0.2, random_state=42)
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# # # # Use random forest
-# # # model = RandomForestClassifier()
-# # # # Fit the model to the training data
-# # # model.fit(X_train, y_train)
+# Use random forest
+model = RandomForestClassifier()
+# Fit the model to the training data
+# model.fit(X_train, y_train)
 
-# # # # Use linear SVC
-# # # model = LinearSVC()
-# # # model.fit(X_train, y_train)
+# # Use linear SVC
+# model = LinearSVC()
+# model.fit(X_train, y_train)
 
-# Use k-nearest neighbors
-model = KNeighborsClassifier(n_neighbors=1)
-model.fit(X_train, y_train)
+# # Use k-nearest neighbors
+# model = KNeighborsClassifier(n_neighbors=1)
+# model.fit(X_train, y_train)
 
 
-# Evaluate the model on the test data
-y_pred = model.predict(X_test)
-accuracy1 = model.score(X_test, y_test)
-accuracy2 = model.score(X_test, y_test)
-print("Accuracy: {:.2f}".format(accuracy1))
-print("Accuracy: {:.2f}".format(accuracy2))
+k = 5
+scores = cross_val_score(model, X, y, cv=k)
+# Print the scores for each fold
+print("Scores for each fold: ", scores)
+# Print the mean score
+print("Mean score: ", scores.mean())
+
+
+# # Evaluate the model on the test data
+# y_pred = model.predict(X_test)
+# accuracy = model.score(X_test, y_test)
+# print("Accuracy: {:.2f}".format(accuracy))

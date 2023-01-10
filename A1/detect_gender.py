@@ -9,6 +9,7 @@ import csv
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 import numpy as np
+from sklearn.model_selection import cross_val_score
 
 
 # Load the shape predictor model
@@ -56,7 +57,7 @@ def get_landmarks(folder):
   # Sort the filenames in numerical order in the folder
   filenames = (os.listdir(folder))
   filenames.sort(key=lambda x: int(x.split(".")[0]))
-  print(filenames[:20])
+  # print(filenames[:20])
   # Get the current performance counter value
   start = time.perf_counter()
 
@@ -110,46 +111,50 @@ def get_landmarks(folder):
   return landmarks, no_landmarks, filenames
 
 
+filenames = (os.listdir(images_dir))
+filenames.sort(key=lambda x: int(x.split(".")[0]))
 gender_labels = get_gender()
-landmarks, no_landmarks, filenames = get_landmarks(images_dir)
+# landmarks, no_landmarks, filenames = get_landmarks(images_dir)
 # print(filenames[:20])
-print(len(landmarks))
+# print(len(landmarks))
 # print(no_landmarks[:20])
-print(len(gender_labels))
-
-
+# print(len(gender_labels))
+no_filenames_file = open("D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/filenames.txt", "r")
+with no_filenames_file as f:
+  no_landmarks = f.readlines()
+no_landmarks = [label.strip() for label in no_landmarks]
 
 
 # Filter the labels with no face detected
-filtered_labels = []
+filtered_gender_labels = []
 # Check if the filename is not in the no_landmarks list
 for label, filename in zip(gender_labels, filenames):
   if filename not in no_landmarks:
-    filtered_labels.append(label)
-print(filtered_labels[:20])
+    filtered_gender_labels.append(label)
+# print(filtered_labels[:20])
 
 
-# Write landmarks in txt file
-with open('D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/landmarks.txt', 'w') as f1:
-  # Clear the contents of the file
-  f1.truncate(0)
-  # Join the elements of the list into a single string, with a newline character as the separator
-  for element in landmarks:
-   f1.write(str(element) + '\n')
+# # Write landmarks in txt file
+# with open('D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/landmarks.txt', 'w') as f1:
+#   # Clear the contents of the file
+#   f1.truncate(0)
+#   # Join the elements of the list into a single string, with a newline character as the separator
+#   for element in landmarks:
+#    f1.write(str(element) + '\n')
 
-with open('D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/labels.txt', 'w') as f2:
-  # Clear the contents of the file
-  f2.truncate(0)
-  # Join the elements of the list into a single string, with a newline character as the separator
-  for element in filtered_labels:
-   f2.write(str(element) + '\n')
+# with open('D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/labels.txt', 'w') as f2:
+#   # Clear the contents of the file
+#   f2.truncate(0)
+#   # Join the elements of the list into a single string, with a newline character as the separator
+#   for element in filtered_labels:
+#    f2.write(str(element) + '\n')
 
-with open('D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/filenames.txt', 'w') as f3:
-  # Clear the contents of the file
-  f3.truncate(0)
-  # Join the elements of the list into a single string, with a newline character as the separator
-  for element in no_landmarks:
-   f3.write(str(element) + '\n')
+# with open('D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/filenames.txt', 'w') as f3:
+#   # Clear the contents of the file
+#   f3.truncate(0)
+#   # Join the elements of the list into a single string, with a newline character as the separator
+#   for element in no_landmarks:
+#    f3.write(str(element) + '\n')
 
 
 # Read lists from txt files
@@ -169,11 +174,11 @@ for line in lines:
   tuples.append(t)
 
 
-gender_labels_file = open("D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/labels.txt", "r")
+# gender_labels_file = open("D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/labels.txt", "r")
   
-with gender_labels_file as f:
-  gender_labels = f.readlines()
-# print(len(gender_labels))
+# with gender_labels_file as f:
+#   gender_labels = f.readlines()
+# # print(len(gender_labels))
 
 
 # print(tuples[0][1][1])
@@ -196,6 +201,18 @@ x3 = get_points(33,0)
 y3 = get_points(33,1)
 x4 = get_points(8,0)
 y4 = get_points(8,1)
+# Points of two sides of the jaw(landmarks = 7,11)
+x5 = get_points(6,0)
+y5 = get_points(6,1)
+x6 = get_points(10,0)
+y6 = get_points(10,1)
+# Points of two sides of the temple(landmarks = 1,17)
+x7 = get_points(0,0)
+y7 = get_points(0,1)
+x8 = get_points(16,0)
+y8 = get_points(16,1)
+
+
 
 
 # Calculate distance between two points for lists
@@ -208,16 +225,35 @@ def distance(x1, y1, x2, y2):
 
 eye_dis = distance(x1, y1, x2, y2)
 nose_chin_dis = distance(x3, y3, x4, y4)
+jaw_width = distance(x5, y5, x6, y6)
+temple_width = distance(x7, y7, x8, y8)
 
-
-ratios = []
+# Ratio of eyes distance, nose chin distance,jaw width and temple width
+et_ratios = []
 for i in range(len(eye_dis)):
-  ratio = eye_dis[i] / nose_chin_dis[i]
-  ratios.append(ratio)
+  ratio = eye_dis[i] / temple_width[i]
+  et_ratios.append(ratio)
 
-# print(ratios) 
+nct_ratios = []
+for i in range(len(nose_chin_dis)):
+  ratio = nose_chin_dis[i] / temple_width[i]
+  nct_ratios.append(ratio)
+
+jt_ratios = []
+for i in range(len(jaw_width)):
+  ratio = jaw_width[i] / temple_width[i]
+  jt_ratios.append(ratio)
 
 
+# Put all features in one list
+X = []
+for i in range(len(et_ratios)):
+  # Create a feature vector by combining the values from X1 and X2
+  x = (et_ratios[i], nct_ratios[i], jt_ratios[i])
+  # Add the feature vector to the list
+  X.append(x)
+
+y = filtered_gender_labels
 # X = ratios
 # X = np.array(X)
 # X = X.reshape(-1, 1)
@@ -226,12 +262,18 @@ for i in range(len(eye_dis)):
 # # Split the data into a training set and a test set
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# # Initialize the model
-# model = RandomForestClassifier()
+# Initialize the model
+model = RandomForestClassifier()
 
 # # Fit the model to the training data
 # model.fit(X_train, y_train)
 
+k = 5
+scores = cross_val_score(model, X, y, cv=k)
+# Print the scores for each fold
+print("Scores for each fold: ", scores)
+# Print the mean score
+print("Mean score: ", scores.mean())
 # # Evaluate the model on the test data
 # accuracy = model.score(X_test, y_test)
 # print("Accuracy: {:.2f}".format(accuracy))
