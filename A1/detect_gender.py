@@ -191,26 +191,57 @@ def get_points(a,b):
   return elements
 
 
-# Points of inner corners of the eyes(landmarks = 40,43)
-x1 = get_points(39,0)
-y1 = get_points(39,1)
-x2 = get_points(42,0)
-y2 = get_points(42,1)
-# Points of tip of the nose and bottom of the chin(landmarks = 34,9)
-x3 = get_points(33,0)
-y3 = get_points(33,1)
-x4 = get_points(8,0)
-y4 = get_points(8,1)
-# Points of two sides of the jaw(landmarks = 7,11)
-x5 = get_points(6,0)
-y5 = get_points(6,1)
-x6 = get_points(10,0)
-y6 = get_points(10,1)
-# Points of two sides of the temple(landmarks = 1,17)
-x7 = get_points(0,0)
-y7 = get_points(0,1)
-x8 = get_points(16,0)
-y8 = get_points(16,1)
+# # Points of inner corners of the eyes(landmarks = 40,43)
+# x1 = get_points(39,0)
+# y1 = get_points(39,1)
+# x2 = get_points(42,0)
+# y2 = get_points(42,1)
+# # Points of tip of the nose and bottom of the chin(landmarks = 34,9)
+# x3 = get_points(33,0)
+# y3 = get_points(33,1)
+# x4 = get_points(8,0)
+# y4 = get_points(8,1)
+# # Points of two sides of the jaw(landmarks = 7,11)
+# x5 = get_points(6,0)
+# y5 = get_points(6,1)
+# x6 = get_points(10,0)
+# y6 = get_points(10,1)
+# # Points of two sides of the temple(landmarks = 1,17)
+# x7 = get_points(0,0)
+# y7 = get_points(0,1)
+# x8 = get_points(16,0)
+# y8 = get_points(16,1)
+
+
+x1 = get_points(48,0)
+y1 = get_points(48,1)
+x2 = get_points(54,0)
+y2 = get_points(54,1)
+x3 = get_points(22,0)
+y3 = get_points(22,1)
+x4 = get_points(26,0)
+y4 = get_points(26,1)
+x5 = get_points(21,0)
+y5 = get_points(21,1)
+x6 = get_points(17,0)
+y6 = get_points(17,1)
+x7 = get_points(42,0)
+y7 = get_points(42,1)
+x8 = get_points(45,0)
+y8 = get_points(45,1)
+x9 = get_points(39,0)
+y9 = get_points(39,1)
+x10 = get_points(36,0)
+y10 = get_points(36,1)
+x11 = get_points(27,0)
+y11 = get_points(27,1)
+x12 = get_points(33,0)
+y12 = get_points(33,1)
+# jaw
+x13 = get_points(4,0)
+y13 = get_points(4,1)
+x14 = get_points(12,0)
+y14 = get_points(12,1)
 
 
 
@@ -245,13 +276,21 @@ for i in range(len(jaw_width)):
   jt_ratios.append(ratio)
 
 
-# Put all features in one list
+# # Put all features in one list
+# X = []
+# for i in range(len(et_ratios)):
+#   # Create a feature vector by combining the values from X1 and X2
+#   x = (et_ratios[i], nct_ratios[i], jt_ratios[i])
+#   # Add the feature vector to the list
+#   X.append(x)
+
 X = []
-for i in range(len(et_ratios)):
+for i in range(len(x1)):
   # Create a feature vector by combining the values from X1 and X2
-  x = (et_ratios[i], nct_ratios[i], jt_ratios[i])
+  x = (x1[i], x2[i], x3[i], x4[i], x5[i], x6[i], x7[i], x8[i], x9[i], x10[i], x11[i], x12[i], x13[i], x14[i] )
   # Add the feature vector to the list
   X.append(x)
+
 
 y = filtered_gender_labels
 # X = ratios
