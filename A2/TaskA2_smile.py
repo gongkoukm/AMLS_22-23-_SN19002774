@@ -46,7 +46,7 @@ def get_smile(basedir, labels_filename):
 
 def get_landmarks(folder):
     # Load the shape predictor model
-    predictor = dlib.shape_predictor("../shape_predictor_68_face_landmarks.dat")
+    predictor = dlib.shape_predictor("./shape_predictor_68_face_landmarks.dat")
     # predictor = dlib.shape_predictor("D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/AMLS_22-23 _SN19002774/shape_predictor_68_face_landmarks.dat")
 
     # Initialize an empty list to store the landmarks and empty landmarks
