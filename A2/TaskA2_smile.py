@@ -59,9 +59,6 @@ def get_landmarks(folder):
     filenames = (os.listdir(folder))
     filenames.sort(key=lambda x: int(x.split(".")[0]))
 
-    # Get the current performance counter value
-    start = time.perf_counter()
-
     # Loop through the images in the folder
     for file in filenames:
         # Load the image
@@ -84,15 +81,6 @@ def get_landmarks(folder):
 
         # Add the landmarks to the list
         landmarks.append(landmark)
-
-    # Get the current performance counter value
-    end = time.perf_counter()
-
-    # Compute the elapsed time
-    elapsed_time = end - start
-
-    # Print the elapsed time
-    print('Elapsed time:', elapsed_time)
 
     # Return the landmarks
     return landmarks, no_landmarks, filenames

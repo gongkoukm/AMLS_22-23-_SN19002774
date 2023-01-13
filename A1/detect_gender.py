@@ -237,10 +237,10 @@ for i in range(len(x1)):
   x = (x1[i], x2[i], x3[i], x4[i], x5[i], x6[i], x7[i], x8[i], x9[i], x10[i], x11[i], x12[i], x13[i], x14[i] )
   # Add the feature vector to the list
   X.append(x)
-print(len(X))
+print(X[:10])
 
 y = filtered_gender_labels + filtered_gender_labels_t
-# print(len(y))
+print(y[:10])
 # Initialize the model
 model = RandomForestClassifier(n_estimators=30, max_depth=3, random_state=0)
 

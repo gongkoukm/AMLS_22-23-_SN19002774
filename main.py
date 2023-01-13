@@ -1,5 +1,7 @@
 import A1.TaskA1_gender as gender
 import A2.TaskA2_smile as smile
+import B1.TaskB1_faceshape as faceshape
+import B2.TaskB2_eyecolor as eyecolor
 import os
 import joblib
 from sklearn.metrics import accuracy_score
@@ -45,8 +47,48 @@ def solve_taskA1A2():
     return
 
 
+def solve_taskB1B2():
+
+    start = time.perf_counter()
+
+    basedir_t = 'D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/Datasets/dataset_AMLS_22-23_test/cartoon_set_test'
+    # basedir_t = '../Datasets/dataset_AMLS_22-23_test/cartoon_set_test'
+    images_dir_t = os.path.join(basedir_t,"img")
+    images_dir_t = images_dir_t.replace('\\', '/')
+    labels_filename_t = 'labels.csv'
+    landmarks_t, no_landmarks_t, filenames_t, eye_colors_t = eyecolor.get_landmarks(images_dir_t)
+    faceshape_labels_t = faceshape.get_faceshape(basedir_t, labels_filename_t)
+    eyecolor_labels_t = eyecolor.get_eyecolor(basedir_t, labels_filename_t)
+    filtered_faceshape_labels_t = faceshape.filter(faceshape_labels_t, filenames_t, no_landmarks_t)
+    filtered_eyecolor_labels_t = smile.filter(eyecolor_labels_t, filenames_t, no_landmarks_t)
+
+    X1 = faceshape.get_faceshape_features(landmarks_t)
+    y1 = filtered_faceshape_labels_t
+
+    X2 = eye_colors_t
+    y2 = filtered_eyecolor_labels_t
+    
+    # model1 = joblib.load('./B1/B1random_forest_model.pkl')
+    model1 = joblib.load('D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/AMLS_22-23 _SN19002774/B1/B1random_forest_model.pkl')
+    predictions1 = model1.predict(X1)
+    accuracy1 = accuracy_score(y1, predictions1)
+    # model2 = joblib.load('./B2/A2random_forest_model.pkl')
+    model2 = joblib.load('D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/AMLS_22-23 _SN19002774/B2/B2random_forest_model.pkl')
+    predictions2 = model2.predict(X2)
+    accuracy2 = accuracy_score(y2, predictions2)
+
+    print("Accuracy: {:.2f}%".format(accuracy1 * 100))
+    print("Accuracy: {:.2f}%".format(accuracy2 * 100))
+
+    end = time.perf_counter()
+    elapsed_time = end - start
+    print('Elapsed time:', elapsed_time)
+
+    return
+
 def main():
     solve_taskA1A2()
+    solve_taskB1B2()
 
 
 if __name__ == "__main__":

@@ -264,7 +264,7 @@ y = filtered_smile_labels + filtered_smile_labels_t
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # Use random forest
-model = RandomForestClassifier(n_estimators=30, max_depth=3, random_state=0)
+model = RandomForestClassifier(n_estimators=10, max_depth=2, random_state=0)
 # # Fit the model to the training data
 # model.fit(X_train, y_train)
 
