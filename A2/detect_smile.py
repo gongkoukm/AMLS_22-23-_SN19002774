@@ -15,6 +15,8 @@ from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
 import time
 from sklearn.metrics import accuracy_score
+from sklearn.model_selection import learning_curve
+import joblib
 
 
 basedir = 'D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/Datasets/dataset_AMLS_22-23/celeba'
@@ -229,10 +231,10 @@ y7 = get_points(51,1,landmarksall)
 x8 = get_points(57,0,landmarksall)
 y8 = get_points(57,1,landmarksall)
 lip_updown = distance(x7, y7, x8, y8)
-lt_ratios = []
+udt_ratios = []
 for i in range(len(lip_updown)):
   ratio = lip_updown[i] / temple_width[i]
-  lt_ratios.append(ratio)
+  udt_ratios.append(ratio)
 
 
 # Need landmark 49(x1,y1)),67,55(x2,y2) to calculate the curvature of mouth
@@ -240,8 +242,6 @@ x9 = get_points(66,0,landmarksall)
 y9 = get_points(66,1,landmarksall)
 curvatures = getAngle(x1, y1, x9, y9, x2, y2)
 curvatures = np.abs(curvatures)
-# print(curvatures[:30])
-# print(filtered_smile_labels[:30])
 
 
 X1 = lt_ratios
@@ -251,24 +251,22 @@ X2 = emt_ratios
 X = []
 for i in range(len(X2)):
   # Create a feature vector by combining the values from X1 and X2
-  x = (curvatures[i], X1[i], X2[i])
+  x = (curvatures[i], X1[i], X2[i], udt_ratios[i])
   # Add the feature vector to the list
   X.append(x)
 
 
-# # Reshape if X is 1D array
-# curvatures = np.array(curvatures)
-# curvatures = curvatures.reshape(-1, 1)
-# print(lt_ratios[:20])
+# Reshape if X is 1D array
+
 y = filtered_smile_labels + filtered_smile_labels_t
 
 # Split the data into a training set and a test set
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # Use random forest
-model = RandomForestClassifier()
-# Fit the model to the training data
-model.fit(X_train, y_train)
+model = RandomForestClassifier(n_estimators=30, max_depth=3, random_state=0)
+# # Fit the model to the training data
+# model.fit(X_train, y_train)
 
 # # Use linear SVC
 # model = LinearSVC()
@@ -287,7 +285,29 @@ model.fit(X_train, y_train)
 # print("Mean score: ", scores.mean())
 
 
-# Evaluate the model on the test data
-y_train_pred = model.predict(X_train)
-train_score = accuracy_score(y_train, y_train_pred)
-print("Accuracy: {:.2f}".format(train_score))
+# # Evaluate the model on the test data
+# y_train_pred = model.predict(X_train)
+# train_score = accuracy_score(y_train, y_train_pred)
+# print("Accuracy: {:.2f}".format(train_score))
+
+train_sizes, train_scores, test_scores = learning_curve(model, X, y, cv=6, n_jobs=-1, train_sizes=np.linspace(0.1, 1.0, 10))
+# calculate mean and standard deviation
+train_scores_mean = np.mean(train_scores, axis=1)
+train_scores_std = np.std(train_scores, axis=1)
+test_scores_mean = np.mean(test_scores, axis=1)
+test_scores_std = np.std(test_scores, axis=1)
+
+model.fit(X, y)
+joblib.dump(model, 'D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/AMLS_22-23 _SN19002774/A2/A2random_forest_model.pkl')
+
+# plot the learning curve
+plt.grid()
+plt.fill_between(train_sizes, train_scores_mean - train_scores_std, train_scores_mean + train_scores_std, alpha=0.1, color="r")
+plt.fill_between(train_sizes, test_scores_mean - test_scores_std, test_scores_mean + test_scores_std, alpha=0.1, color="g")
+plt.plot(train_sizes, train_scores_mean, 'o-', color="r", label="Training score")
+plt.plot(train_sizes, test_scores_mean, 'o-', color="g", label="Cross-validation score")
+plt.legend(loc="best")
+plt.xlabel("Smile Training examples")
+plt.ylabel("Score")
+plt.ylim([0, 1])
+plt.show()

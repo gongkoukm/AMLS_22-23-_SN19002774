@@ -240,7 +240,7 @@ for i in range(len(x1)):
 print(len(X))
 
 y = filtered_gender_labels + filtered_gender_labels_t
-print(len(y))
+# print(len(y))
 # Initialize the model
 model = RandomForestClassifier(n_estimators=30, max_depth=3, random_state=0)
 
@@ -258,6 +258,8 @@ train_scores_mean = np.mean(train_scores, axis=1)
 train_scores_std = np.std(train_scores, axis=1)
 test_scores_mean = np.mean(test_scores, axis=1)
 test_scores_std = np.std(test_scores, axis=1)
+
+model.fit(X, y)
 joblib.dump(model, 'D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/AMLS_22-23 _SN19002774/A1/random_forest_model.pkl')
 
 # plot the learning curve
@@ -267,7 +269,7 @@ plt.fill_between(train_sizes, test_scores_mean - test_scores_std, test_scores_me
 plt.plot(train_sizes, train_scores_mean, 'o-', color="r", label="Training score")
 plt.plot(train_sizes, test_scores_mean, 'o-', color="g", label="Cross-validation score")
 plt.legend(loc="best")
-plt.xlabel("Training examples")
+plt.xlabel("Gender Training examples")
 plt.ylabel("Score")
 plt.ylim([0, 1])
 plt.show()
