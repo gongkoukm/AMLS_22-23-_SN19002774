@@ -1,9 +1,7 @@
 import cv2
 import dlib
 import os
-import time
 import math
-import ast
 import re
 import csv
 from sklearn.model_selection import train_test_split
@@ -15,8 +13,8 @@ import joblib
 import matplotlib.pyplot as plt
 
 
-basedir_t = 'D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/Datasets/dataset_AMLS_22-23_test/cartoon_set_test'
-# basedir_t = '../Datasets/dataset_AMLS_22-23_test/cartoon_set_test'
+# basedir_t = 'D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/Datasets/dataset_AMLS_22-23_test/cartoon_set_test'
+basedir_t = '../Datasets/dataset_AMLS_22-23_test/cartoon_set_test'
 images_dir_t = os.path.join(basedir_t,"img")
 images_dir_t = images_dir_t.replace('\\', '/')
 labels_filename_t = 'labels.csv'
@@ -47,8 +45,8 @@ def get_faceshape(basedir, labels_filename):
 
 def get_landmarks(folder):
   # Load the shape predictor model
-  # predictor = dlib.shape_predictor("../shape_predictor_68_face_landmarks.dat")
-  predictor = dlib.shape_predictor("D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/AMLS_22-23 _SN19002774/shape_predictor_68_face_landmarks.dat")
+  predictor = dlib.shape_predictor("../shape_predictor_68_face_landmarks.dat")
+  # predictor = dlib.shape_predictor("D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/AMLS_22-23 _SN19002774/shape_predictor_68_face_landmarks.dat")
 
   # Initialize an empty list to store the landmarks and empty landmarks
   landmarks = []
@@ -92,6 +90,7 @@ def filter(faceshape_labels, filenames, no_landmarks):
     for label, filename in zip(faceshape_labels, filenames):
         if filename not in no_landmarks:
             filtered_faceshape_labels.append(label)
+
     return filtered_faceshape_labels
 
 
@@ -104,6 +103,7 @@ def get_faceshape_features(landmarks):
 
         for t in tuples:
             elements.append(t[a][b])
+
         return elements
     
     # Calculate distance between two points for lists
@@ -112,6 +112,7 @@ def get_faceshape_features(landmarks):
         for i in range(len(x1)):
             d = math.sqrt(math.pow(x1[i] - x2[i], 2) + math.pow(y1[i] - y2[i], 2))
             distances.append(d)
+            
         return distances
 
 
@@ -155,5 +156,30 @@ def get_faceshape_features(landmarks):
         # Add the feature vector to the list
         X.append(x)
 
-
     return X
+
+
+# model = RandomForestClassifier(n_estimators=30, max_depth=3, random_state=0)
+
+# train_sizes, train_scores, test_scores = learning_curve(model, X, y, cv=6, n_jobs=-1, train_sizes=np.linspace(0.1, 1.0, 10))
+
+# # calculate mean and standard deviation
+# train_scores_mean = np.mean(train_scores, axis=1)
+# train_scores_std = np.std(train_scores, axis=1)
+# test_scores_mean = np.mean(test_scores, axis=1)
+# test_scores_std = np.std(test_scores, axis=1)
+
+# model.fit(X, y)
+# joblib.dump(model, 'D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/AMLS_22-23 _SN19002774/A1/random_forest_model.pkl')
+
+# # plot the learning curve
+# plt.grid()
+# plt.fill_between(train_sizes, train_scores_mean - train_scores_std, train_scores_mean + train_scores_std, alpha=0.1, color="r")
+# plt.fill_between(train_sizes, test_scores_mean - test_scores_std, test_scores_mean + test_scores_std, alpha=0.1, color="g")
+# plt.plot(train_sizes, train_scores_mean, 'o-', color="r", label="Training score")
+# plt.plot(train_sizes, test_scores_mean, 'o-', color="g", label="Cross-validation score")
+# plt.legend(loc="best")
+# plt.xlabel("Training examples")
+# plt.ylabel("Score")
+# plt.ylim([0, 1])
+# plt.show()

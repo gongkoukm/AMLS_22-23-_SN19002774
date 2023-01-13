@@ -1,9 +1,7 @@
 import cv2
 import dlib
 import os
-import time
 import math
-import ast
 import re
 import csv
 from sklearn.model_selection import train_test_split
@@ -15,8 +13,8 @@ from sklearn.model_selection import cross_val_score
 import joblib
 
 
-basedir_t = 'D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/Datasets/dataset_AMLS_22-23_test/celeba_test'
-# basedir_t = '../Datasets/dataset_AMLS_22-23_test/celeba_test'
+# basedir_t = 'D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/Datasets/dataset_AMLS_22-23_test/celeba_test'
+basedir_t = '../Datasets/dataset_AMLS_22-23_test/celeba_test'
 images_dir_t = os.path.join(basedir_t,"img")
 images_dir_t = images_dir_t.replace('\\', '/')
 labels_filename_t = 'labels.csv'
@@ -48,8 +46,8 @@ def get_gender(basedir, labels_filename):
 
 def get_landmarks(folder):
     # Load the shape predictor model
-    # predictor = dlib.shape_predictor("../shape_predictor_68_face_landmarks.dat")
-    predictor = dlib.shape_predictor("D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/AMLS_22-23 _SN19002774/shape_predictor_68_face_landmarks.dat")
+    predictor = dlib.shape_predictor("../shape_predictor_68_face_landmarks.dat")
+    # predictor = dlib.shape_predictor("D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/AMLS_22-23 _SN19002774/shape_predictor_68_face_landmarks.dat")
 
     # Initialize an empty list to store the landmarks and empty landmarks
     landmarks = []
@@ -92,7 +90,8 @@ def filter(gender_labels, filenames, no_landmarks):
     # Check if the filename is not in the no_landmarks list
     for label, filename in zip(gender_labels, filenames):
         if filename not in no_landmarks:
-            filtered_gender_labels.append(label)
+            filtered_gender_labels.append(label)\
+
     return filtered_gender_labels
 
 
@@ -105,6 +104,7 @@ def get_gender_features(landmarks):
 
         for t in tuples:
             elements.append(t[a][b])
+
         return elements
     
     # Calculate distance between two points for lists
@@ -113,6 +113,7 @@ def get_gender_features(landmarks):
         for i in range(len(x1)):
             d = math.sqrt(math.pow(x1[i] - x2[i], 2) + math.pow(y1[i] - y2[i], 2))
             distances.append(d)
+
         return distances
 
     x1 = get_points(48,0,landmarks)
@@ -150,7 +151,6 @@ def get_gender_features(landmarks):
         x = (x1[i], x2[i], x3[i], x4[i], x5[i], x6[i], x7[i], x8[i], x9[i], x10[i], x11[i], x12[i], x13[i], x14[i])
         # Add the feature vector to the list
         X.append(x)
-
 
     return X
 
