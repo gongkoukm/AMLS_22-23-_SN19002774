@@ -97,7 +97,7 @@ def filter(faceshape_labels, filenames, no_landmarks):
 # Get the features need for B1
 def get_faceshape_features(landmarks):
 
-    def get_points(a,b,tuples):
+    def get_points(a, b, tuples):
 
         elements = []
 
@@ -112,7 +112,7 @@ def get_faceshape_features(landmarks):
         for i in range(len(x1)):
             d = math.sqrt(math.pow(x1[i] - x2[i], 2) + math.pow(y1[i] - y2[i], 2))
             distances.append(d)
-            
+
         return distances
 
 

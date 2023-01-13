@@ -98,7 +98,7 @@ def filter(gender_labels, filenames, no_landmarks):
 # Get the features need for A1
 def get_gender_features(landmarks):
 
-    def get_points(a,b,tuples):
+    def get_points(a, b, tuples):
 
         elements = []
 

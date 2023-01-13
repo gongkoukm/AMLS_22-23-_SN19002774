@@ -92,14 +92,14 @@ def filter(smile_labels, filenames, no_landmarks):
     for label, filename in zip(smile_labels, filenames):
         if filename not in no_landmarks:
             filtered_smile_labels.append(label)
-            
+
     return filtered_smile_labels
 
 
 # Get the features need for A2
 def get_smile_features(landmarks):
 
-    def get_points(a,b,tuples):
+    def get_points(a, b, tuples):
 
         elements = []
 
@@ -119,7 +119,7 @@ def get_smile_features(landmarks):
 
 
     # Calculate angle between three points
-    def getAngle(x1,y1,x2,y2,x3,y3):
+    def getAngle(x1, y1, x2, y2, x3, y3):
         angle = []
         for i in range(len(x1)):
             ang = 180-(math.degrees(math.atan2(abs(y3[i]-y2[i]), abs(x3[i]-x2[i])) + math.atan2(abs(y1[i]-y2[i]), abs(x1[i]-x2[i]))))
