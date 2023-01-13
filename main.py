@@ -11,8 +11,8 @@ def solve_taskA1A2():
 
     start = time.perf_counter()
 
-    basedir_t = 'D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/Datasets/dataset_AMLS_22-23_test/celeba_test'
-    # basedir_t = '../Datasets/dataset_AMLS_22-23_test/celeba_test'
+    # basedir_t = 'D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/Datasets/dataset_AMLS_22-23_test/celeba_test'
+    basedir_t = './Datasets/dataset_AMLS_22-23_test/celeba_test'
     images_dir_t = os.path.join(basedir_t,"img")
     images_dir_t = images_dir_t.replace('\\', '/')
     labels_filename_t = 'labels.csv'
@@ -28,12 +28,12 @@ def solve_taskA1A2():
     X2 = smile.get_smile_features(landmarks_t)
     y2 = filtered_smile_labels_t
 
-    # model1 = joblib.load('./A1/random_forest_model.pkl')
-    model1 = joblib.load('D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/AMLS_22-23 _SN19002774/A1/random_forest_model.pkl')
+    model1 = joblib.load('./A1/random_forest_model.pkl')
+    # model1 = joblib.load('D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/AMLS_22-23 _SN19002774/A1/random_forest_model.pkl')
     predictions1 = model1.predict(X1)
     accuracy1 = accuracy_score(y1, predictions1)
-    # model2 = joblib.load('./A2/A2random_forest_model.pkl')
-    model2 = joblib.load('D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/AMLS_22-23 _SN19002774/A2/A2random_forest_model.pkl')
+    model2 = joblib.load('./A2/A2random_forest_model.pkl')
+    # model2 = joblib.load('D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/AMLS_22-23 _SN19002774/A2/A2random_forest_model.pkl')
     predictions2 = model2.predict(X2)
     accuracy2 = accuracy_score(y2, predictions2)
 
@@ -51,8 +51,8 @@ def solve_taskB1B2():
 
     start = time.perf_counter()
 
-    basedir_t = 'D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/Datasets/dataset_AMLS_22-23_test/cartoon_set_test'
-    # basedir_t = '../Datasets/dataset_AMLS_22-23_test/cartoon_set_test'
+    # basedir_t = 'D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/Datasets/dataset_AMLS_22-23_test/cartoon_set_test'
+    basedir_t = './Datasets/dataset_AMLS_22-23_test/cartoon_set_test'
     images_dir_t = os.path.join(basedir_t,"img")
     images_dir_t = images_dir_t.replace('\\', '/')
     labels_filename_t = 'labels.csv'
@@ -68,12 +68,12 @@ def solve_taskB1B2():
     X2 = eye_colors_t
     y2 = filtered_eyecolor_labels_t
     
-    # model1 = joblib.load('./B1/B1random_forest_model.pkl')
-    model1 = joblib.load('D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/AMLS_22-23 _SN19002774/B1/B1random_forest_model.pkl')
+    model1 = joblib.load('./B1/B1random_forest_model.pkl')
+    # model1 = joblib.load('D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/AMLS_22-23 _SN19002774/B1/B1random_forest_model.pkl')
     predictions1 = model1.predict(X1)
     accuracy1 = accuracy_score(y1, predictions1)
-    # model2 = joblib.load('./B2/A2random_forest_model.pkl')
-    model2 = joblib.load('D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/AMLS_22-23 _SN19002774/B2/B2random_forest_model.pkl')
+    model2 = joblib.load('./B2/B2random_forest_model.pkl')
+    # model2 = joblib.load('D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/AMLS_22-23 _SN19002774/B2/B2random_forest_model.pkl')
     predictions2 = model2.predict(X2)
     accuracy2 = accuracy_score(y2, predictions2)
 

@@ -113,7 +113,7 @@ def filter(eyecolor_labels, filenames, no_landmarks):
     for label, filename in zip(eyecolor_labels, filenames):
         if filename not in no_landmarks:
             filtered_eyecolor_labels.append(label)
-            
+
     return filtered_eyecolor_labels  
 
 
