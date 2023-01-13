@@ -8,19 +8,27 @@ import re
 import csv
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import learning_curve
+import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.model_selection import cross_val_score
+import joblib
 
 
 # Load the shape predictor model
 
 basedir = 'D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/Datasets/dataset_AMLS_22-23/celeba'
+basedir_t = 'D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/Datasets/dataset_AMLS_22-23_test/celeba_test'
 images_dir = os.path.join(basedir,"img")
 images_dir = images_dir.replace('\\', '/')
+images_dir_t = os.path.join(basedir_t,"img")
+images_dir_t = images_dir_t.replace('\\', '/')
 labels_filename = 'labels.csv'
+labels_filename_t = 'labels.csv'
 
 
-def get_gender():
+
+def get_gender(basedir, labels_filename):
     # Get all celeba's image paths
     # image_paths = [os.path.join(images_dir, l) for l in os.listdir(images_dir)]
     with open(os.path.join(basedir, labels_filename), 'r') as file:
@@ -79,17 +87,6 @@ def get_landmarks(folder):
       no_landmarks.append(file)
       continue
 
-    # # Loop through the faces
-    # for face in faces:
-    #   # Predict the face landmarks
-    #   landmark = predictor(image, face)
-
-    #   # Convert the landmarks to a list of (x, y) coordinates
-    #   landmark = [(point.x, point.y) for point in landmark.parts()]
-
-    #   # Add the landmarks to the list
-    #   landmarks.append(landmark)
-
     landmark = predictor(gray, faces[0])
 
     # Convert the landmarks to a list of (x, y) coordinates
@@ -113,25 +110,10 @@ def get_landmarks(folder):
 
 filenames = (os.listdir(images_dir))
 filenames.sort(key=lambda x: int(x.split(".")[0]))
-gender_labels = get_gender()
+gender_labels = get_gender(basedir, labels_filename)
+gender_labels_t = get_gender(basedir_t, labels_filename_t)
 # landmarks, no_landmarks, filenames = get_landmarks(images_dir)
-# print(filenames[:20])
-# print(len(landmarks))
-# print(no_landmarks[:20])
-# print(len(gender_labels))
-no_filenames_file = open("D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/filenames.txt", "r")
-with no_filenames_file as f:
-  no_landmarks = f.readlines()
-no_landmarks = [label.strip() for label in no_landmarks]
-
-
-# Filter the labels with no face detected
-filtered_gender_labels = []
-# Check if the filename is not in the no_landmarks list
-for label, filename in zip(gender_labels, filenames):
-  if filename not in no_landmarks:
-    filtered_gender_labels.append(label)
-# print(filtered_labels[:20])
+landmarks_t, no_landmarks_t, filenames_t = get_landmarks(images_dir_t)
 
 
 # # Write landmarks in txt file
@@ -158,6 +140,24 @@ for label, filename in zip(gender_labels, filenames):
 
 
 # Read lists from txt files
+no_filenames_file = open("D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/filenames.txt", "r")
+with no_filenames_file as f:
+  no_landmarks = f.readlines()
+no_landmarks = [label.strip() for label in no_landmarks]
+
+def filter(gender_labels, filenames, no_landmarks):
+  # Filter the labels with no face detected
+  filtered_gender_labels = []
+  # Check if the filename is not in the no_landmarks list
+  for label, filename in zip(gender_labels, filenames):
+    if filename not in no_landmarks:
+      filtered_gender_labels.append(label)
+  return filtered_gender_labels
+
+filtered_gender_labels = filter(gender_labels, filenames, no_landmarks)
+filtered_gender_labels_t = filter(gender_labels_t, filenames_t, no_landmarks_t)
+
+
 # opening the landmarks.txt file in read mode
 landmarks_file = open("D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/landmarks.txt", "r")
   
@@ -173,7 +173,7 @@ for line in lines:
   t = ast.literal_eval(line)
   tuples.append(t)
 
-
+landmarksall = tuples + landmarks_t
 # gender_labels_file = open("D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/labels.txt", "r")
   
 # with gender_labels_file as f:
@@ -182,7 +182,7 @@ for line in lines:
 
 
 # print(tuples[0][1][1])
-def get_points(a,b):
+def get_points(a,b,tuples):
 
   elements = []
 
@@ -191,59 +191,35 @@ def get_points(a,b):
   return elements
 
 
-# # Points of inner corners of the eyes(landmarks = 40,43)
-# x1 = get_points(39,0)
-# y1 = get_points(39,1)
-# x2 = get_points(42,0)
-# y2 = get_points(42,1)
-# # Points of tip of the nose and bottom of the chin(landmarks = 34,9)
-# x3 = get_points(33,0)
-# y3 = get_points(33,1)
-# x4 = get_points(8,0)
-# y4 = get_points(8,1)
-# # Points of two sides of the jaw(landmarks = 7,11)
-# x5 = get_points(6,0)
-# y5 = get_points(6,1)
-# x6 = get_points(10,0)
-# y6 = get_points(10,1)
-# # Points of two sides of the temple(landmarks = 1,17)
-# x7 = get_points(0,0)
-# y7 = get_points(0,1)
-# x8 = get_points(16,0)
-# y8 = get_points(16,1)
-
-
-x1 = get_points(48,0)
-y1 = get_points(48,1)
-x2 = get_points(54,0)
-y2 = get_points(54,1)
-x3 = get_points(22,0)
-y3 = get_points(22,1)
-x4 = get_points(26,0)
-y4 = get_points(26,1)
-x5 = get_points(21,0)
-y5 = get_points(21,1)
-x6 = get_points(17,0)
-y6 = get_points(17,1)
-x7 = get_points(42,0)
-y7 = get_points(42,1)
-x8 = get_points(45,0)
-y8 = get_points(45,1)
-x9 = get_points(39,0)
-y9 = get_points(39,1)
-x10 = get_points(36,0)
-y10 = get_points(36,1)
-x11 = get_points(27,0)
-y11 = get_points(27,1)
-x12 = get_points(33,0)
-y12 = get_points(33,1)
+x1 = get_points(48,0,landmarksall)
+y1 = get_points(48,1,landmarksall)
+x2 = get_points(54,0,landmarksall)
+y2 = get_points(54,1,landmarksall)
+x3 = get_points(22,0,landmarksall)
+y3 = get_points(22,1,landmarksall)
+x4 = get_points(26,0,landmarksall)
+y4 = get_points(26,1,landmarksall)
+x5 = get_points(21,0,landmarksall)
+y5 = get_points(21,1,landmarksall)
+x6 = get_points(17,0,landmarksall)
+y6 = get_points(17,1,landmarksall)
+x7 = get_points(42,0,landmarksall)
+y7 = get_points(42,1,landmarksall)
+x8 = get_points(45,0,landmarksall)
+y8 = get_points(45,1,landmarksall)
+x9 = get_points(39,0,landmarksall)
+y9 = get_points(39,1,landmarksall)
+x10 = get_points(36,0,landmarksall)
+y10 = get_points(36,1,landmarksall)
+x11 = get_points(27,0,landmarksall)
+y11 = get_points(27,1,landmarksall)
+x12 = get_points(33,0,landmarksall)
+y12 = get_points(33,1,landmarksall)
 # jaw
-x13 = get_points(4,0)
-y13 = get_points(4,1)
-x14 = get_points(12,0)
-y14 = get_points(12,1)
-
-
+x13 = get_points(4,0,landmarksall)
+y13 = get_points(4,1,landmarksall)
+x14 = get_points(12,0,landmarksall)
+y14 = get_points(12,1,landmarksall)
 
 
 # Calculate distance between two points for lists
@@ -254,35 +230,6 @@ def distance(x1, y1, x2, y2):
     distances.append(d)
   return distances
 
-eye_dis = distance(x1, y1, x2, y2)
-nose_chin_dis = distance(x3, y3, x4, y4)
-jaw_width = distance(x5, y5, x6, y6)
-temple_width = distance(x7, y7, x8, y8)
-
-# Ratio of eyes distance, nose chin distance,jaw width and temple width
-et_ratios = []
-for i in range(len(eye_dis)):
-  ratio = eye_dis[i] / temple_width[i]
-  et_ratios.append(ratio)
-
-nct_ratios = []
-for i in range(len(nose_chin_dis)):
-  ratio = nose_chin_dis[i] / temple_width[i]
-  nct_ratios.append(ratio)
-
-jt_ratios = []
-for i in range(len(jaw_width)):
-  ratio = jaw_width[i] / temple_width[i]
-  jt_ratios.append(ratio)
-
-
-# # Put all features in one list
-# X = []
-# for i in range(len(et_ratios)):
-#   # Create a feature vector by combining the values from X1 and X2
-#   x = (et_ratios[i], nct_ratios[i], jt_ratios[i])
-#   # Add the feature vector to the list
-#   X.append(x)
 
 X = []
 for i in range(len(x1)):
@@ -290,29 +237,37 @@ for i in range(len(x1)):
   x = (x1[i], x2[i], x3[i], x4[i], x5[i], x6[i], x7[i], x8[i], x9[i], x10[i], x11[i], x12[i], x13[i], x14[i] )
   # Add the feature vector to the list
   X.append(x)
+print(len(X))
 
-
-y = filtered_gender_labels
-# X = ratios
-# X = np.array(X)
-# X = X.reshape(-1, 1)
-# y = gender_labels
-
-# # Split the data into a training set and a test set
-# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
+y = filtered_gender_labels + filtered_gender_labels_t
+print(len(y))
 # Initialize the model
-model = RandomForestClassifier()
+model = RandomForestClassifier(n_estimators=30, max_depth=3, random_state=0)
 
-# # Fit the model to the training data
-# model.fit(X_train, y_train)
+# k = 5
+# scores = cross_val_score(model, X, y, cv=k)
+# # Print the scores for each fold
+# print("Scores for each fold: ", scores)
+# # Print the mean score
+# print("Mean score: ", scores.mean())
 
-k = 5
-scores = cross_val_score(model, X, y, cv=k)
-# Print the scores for each fold
-print("Scores for each fold: ", scores)
-# Print the mean score
-print("Mean score: ", scores.mean())
-# # Evaluate the model on the test data
-# accuracy = model.score(X_test, y_test)
-# print("Accuracy: {:.2f}".format(accuracy))
+train_sizes, train_scores, test_scores = learning_curve(model, X, y, cv=6, n_jobs=-1, train_sizes=np.linspace(0.1, 1.0, 10))
+
+# calculate mean and standard deviation
+train_scores_mean = np.mean(train_scores, axis=1)
+train_scores_std = np.std(train_scores, axis=1)
+test_scores_mean = np.mean(test_scores, axis=1)
+test_scores_std = np.std(test_scores, axis=1)
+joblib.dump(model, 'D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/AMLS_22-23 _SN19002774/A1/random_forest_model.pkl')
+
+# plot the learning curve
+plt.grid()
+plt.fill_between(train_sizes, train_scores_mean - train_scores_std, train_scores_mean + train_scores_std, alpha=0.1, color="r")
+plt.fill_between(train_sizes, test_scores_mean - test_scores_std, test_scores_mean + test_scores_std, alpha=0.1, color="g")
+plt.plot(train_sizes, train_scores_mean, 'o-', color="r", label="Training score")
+plt.plot(train_sizes, test_scores_mean, 'o-', color="g", label="Cross-validation score")
+plt.legend(loc="best")
+plt.xlabel("Training examples")
+plt.ylabel("Score")
+plt.ylim([0, 1])
+plt.show()

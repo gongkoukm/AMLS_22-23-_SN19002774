@@ -13,15 +13,21 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
+import time
+from sklearn.metrics import accuracy_score
 
 
 basedir = 'D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/Datasets/dataset_AMLS_22-23/celeba'
+basedir_t = 'D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/Datasets/dataset_AMLS_22-23_test/celeba_test'
 images_dir = os.path.join(basedir,"img")
 images_dir = images_dir.replace('\\', '/')
+images_dir_t = os.path.join(basedir_t,"img")
+images_dir_t = images_dir_t.replace('\\', '/')
 labels_filename = 'labels.csv'
+labels_filename_t = 'labels.csv'
 
 
-def get_smile():
+def get_smile(basedir, labels_filename):
     # Get all celeba's image paths
     # image_paths = [os.path.join(images_dir, l) for l in os.listdir(images_dir)]
     with open(os.path.join(basedir, labels_filename), 'r') as file:
@@ -47,9 +53,64 @@ def get_smile():
     return smile_list
 
 
+def get_landmarks(folder):
+  # Load the shape predictor model
+  predictor = dlib.shape_predictor("D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/final-assignment/AMLS_22-23 _SN19002774/shape_predictor_68_face_landmarks.dat")
+
+  # Initialize an empty list to store the landmarks and empty landmarks
+  landmarks = []
+  no_landmarks = []
+
+  # Sort the filenames in numerical order in the folder
+  filenames = (os.listdir(folder))
+  filenames.sort(key=lambda x: int(x.split(".")[0]))
+  # print(filenames[:20])
+  # Get the current performance counter value
+  start = time.perf_counter()
+
+  # Loop through the images in the folder
+  for file in filenames:
+  # for i,file in enumerate(filenames):
+  #   if i >= 10:
+  #    break
+    # Load the image
+    image = cv2.imread(os.path.join(folder, file))
+
+    # Detect faces in the image
+    detector = dlib.get_frontal_face_detector()
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    faces = detector(gray)
+    
+    # If no face is detected, append the filename to the no_landmarks list
+    if len(faces) == 0:
+      no_landmarks.append(file)
+      continue
+
+    landmark = predictor(gray, faces[0])
+
+    # Convert the landmarks to a list of (x, y) coordinates
+    landmark = [(point.x, point.y) for point in landmark.parts()]
+
+    # Add the landmarks to the list
+    landmarks.append(landmark)
+
+  # Get the current performance counter value
+  end = time.perf_counter()
+
+  # Compute the elapsed time
+  elapsed_time = end - start
+
+  # Print the elapsed time
+  print('Elapsed time:', elapsed_time)
+
+  # Return the landmarks
+  return landmarks, no_landmarks, filenames
+
 filenames = (os.listdir(images_dir))
 filenames.sort(key=lambda x: int(x.split(".")[0]))
-smile_labels = get_smile()
+smile_labels = get_smile(basedir, labels_filename)
+smile_labels_t = get_smile(basedir_t, labels_filename_t)
+landmarks_t, no_landmarks_t, filenames_t = get_landmarks(images_dir_t)
 
 # Read lists from txt files
 # opening the landmarks.txt file in read mode
@@ -66,7 +127,7 @@ for line in lines:
   t = ast.literal_eval(line)
   landmarks.append(t)
 
-
+landmarksall = landmarks + landmarks_t
 # gender_labels_file = open("D:/UCL 4th year/ELEC0134 Applied Machine Learning Systems 2223/labels.txt", "r")
 
 # with gender_labels_file as f:
@@ -78,36 +139,39 @@ with no_filenames_file as f:
 no_landmarks = [label.strip() for label in no_landmarks]
 
 # Filter the labels with no face detected
-filtered_smile_labels = []
-# Check if the filename is not in the no_landmarks list
-for label, filename in zip(smile_labels, filenames):
-  if filename not in no_landmarks:
-    filtered_smile_labels.append(label)
-# print(filtered_smile_labels[:20])
-# print(no_landmarks)
-# print(len(landmarks))
+def filter(smile_labels, filenames, no_landmarks):
+  # Filter the labels with no face detected
+  filtered_gender_labels = []
+  # Check if the filename is not in the no_landmarks list
+  for label, filename in zip(smile_labels, filenames):
+    if filename not in no_landmarks:
+      filtered_gender_labels.append(label)
+  return filtered_gender_labels
+
+filtered_smile_labels = filter(smile_labels, filenames, no_landmarks)
+filtered_smile_labels_t = filter(smile_labels_t, filenames_t, no_landmarks_t)
 
 
 
-def get_points(a,b):
+def get_points(a,b,landmarksall):
 
   elements = []
 
-  for t in landmarks:
+  for t in landmarksall:
     elements.append(t[a][b])
   return elements
 
 
 # Points of corners of the mouth(landmarks = 49,55)
-x1 = get_points(48,0)
-y1 = get_points(48,1)
-x2 = get_points(54,0)
-y2 = get_points(54,1)
+x1 = get_points(48,0,landmarksall)
+y1 = get_points(48,1,landmarksall)
+x2 = get_points(54,0,landmarksall)
+y2 = get_points(54,1,landmarksall)
 # Points of the temple(landmarks = 1,17)
-x3 = get_points(0,0)
-y3 = get_points(0,1)
-x4 = get_points(16,0)
-y4 = get_points(16,1)
+x3 = get_points(0,0,landmarksall)
+y3 = get_points(0,1,landmarksall)
+x4 = get_points(16,0,landmarksall)
+y4 = get_points(16,1,landmarksall)
 
 
 # Calculate distance between two points for lists
@@ -139,10 +203,10 @@ for i in range(len(lip_width)):
 
 
 # Points of the bottom of eyes(landmarks = 42,47)
-x5 = get_points(41,0)
-y5 = get_points(41,1)
-x6 = get_points(46,0)
-y6 = get_points(46,1)
+x5 = get_points(41,0,landmarksall)
+y5 = get_points(41,1,landmarksall)
+x6 = get_points(46,0,landmarksall)
+y6 = get_points(46,1,landmarksall)
 
 eyemouth_dis = []
 eyemouth_dis_left = distance(x5, y5, x1, y1)
@@ -160,10 +224,10 @@ for i in range(len(eyemouth_dis)):
 
 
 # Points of the top and bottom lip(landmarks = 52,58)
-x7 = get_points(51,0)
-y7 = get_points(51,1)
-x8 = get_points(57,0)
-y8 = get_points(57,1)
+x7 = get_points(51,0,landmarksall)
+y7 = get_points(51,1,landmarksall)
+x8 = get_points(57,0,landmarksall)
+y8 = get_points(57,1,landmarksall)
 lip_updown = distance(x7, y7, x8, y8)
 lt_ratios = []
 for i in range(len(lip_updown)):
@@ -172,11 +236,8 @@ for i in range(len(lip_updown)):
 
 
 # Need landmark 49(x1,y1)),67,55(x2,y2) to calculate the curvature of mouth
-x9 = get_points(66,0)
-y9 = get_points(66,1)
-point1 = [x1, y1]
-point2 = [x9, y9] 
-point3 = [x2, y2] 
+x9 = get_points(66,0,landmarksall)
+y9 = get_points(66,1,landmarksall)
 curvatures = getAngle(x1, y1, x9, y9, x2, y2)
 curvatures = np.abs(curvatures)
 # print(curvatures[:30])
@@ -199,15 +260,15 @@ for i in range(len(X2)):
 # curvatures = np.array(curvatures)
 # curvatures = curvatures.reshape(-1, 1)
 # print(lt_ratios[:20])
-y = filtered_smile_labels
+y = filtered_smile_labels + filtered_smile_labels_t
 
 # Split the data into a training set and a test set
-# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # Use random forest
 model = RandomForestClassifier()
 # Fit the model to the training data
-# model.fit(X_train, y_train)
+model.fit(X_train, y_train)
 
 # # Use linear SVC
 # model = LinearSVC()
@@ -218,15 +279,15 @@ model = RandomForestClassifier()
 # model.fit(X_train, y_train)
 
 
-k = 5
-scores = cross_val_score(model, X, y, cv=k)
-# Print the scores for each fold
-print("Scores for each fold: ", scores)
-# Print the mean score
-print("Mean score: ", scores.mean())
+# k = 5
+# scores = cross_val_score(model, X, y, cv=k)
+# # Print the scores for each fold
+# print("Scores for each fold: ", scores)
+# # Print the mean score
+# print("Mean score: ", scores.mean())
 
 
-# # Evaluate the model on the test data
-# y_pred = model.predict(X_test)
-# accuracy = model.score(X_test, y_test)
-# print("Accuracy: {:.2f}".format(accuracy))
+# Evaluate the model on the test data
+y_train_pred = model.predict(X_train)
+train_score = accuracy_score(y_train, y_train_pred)
+print("Accuracy: {:.2f}".format(train_score))
